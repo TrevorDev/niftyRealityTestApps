@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "module": "commonjs",
+        "esModuleInterop": true,
+        "target": "es6",
+        "strictNullChecks": true,
+        "lib": [
+            "es6",
+            "dom",
+            "es2017.sharedmemory"
+        ]
+    }
+}

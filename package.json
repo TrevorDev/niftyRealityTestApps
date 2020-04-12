@@ -1,0 +1,24 @@
+{
+  "name": "niftyrealitytestapps",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "dependencies": {
+    "concurrently": "^5.1.0",
+    "nodemon-webpack-plugin": "^4.3.1",
+    "serve": "^11.3.0",
+    "ts-loader": "^6.2.2",
+    "twgl.js": "^4.14.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "concurrently \"webpack --watch --mode=development --info-verbosity=verbose\" \"serve . -C\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
