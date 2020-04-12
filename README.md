@@ -30,3 +30,11 @@ This is not a test app repo, it's a movement
 
 ### How to provide feedback or ask questions
  - Join the NiftyKick discord (https://niftykick.com/)
+
+### Supported devices
+ - Currently only tested on Quest
+
+### TODO (A bunch of features are missing, and api may change)
+ - Input handling (Allow apps to know if a ray hit their app)
+ - Control lighting of parent world
+ - Guides for BabylonJS, ThreeJS and other renderers
