@@ -25,6 +25,7 @@ This is not a test app repo, it's a movement
  - Go to https://reality.niftykick.com/new?debugApp=http://localhost:5000/dist/helloWorld.js
  - If it worked you should see a fox spinning on a box
  - The main code is found in helloWorld.ts
+ - Modify that code to change the fox/box position and refresh the webpage to test
  - If anything doesn't work join our discord and we'll be happy to help!
 
 ### How to provide feedback or ask questions
