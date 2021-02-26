@@ -15,7 +15,7 @@ export class MultiviewFramebuffer {
 
             // TODO enabling this caused depth compositing to break?
             // https://developer.oculus.com/documentation/oculus-browser/browser-multiview/?locale=en_US
-            //  is_multisampled = true;
+            is_multisampled = true;
         }
         else {
             // console.log("OCULUS_multiview extension is NOT supported");

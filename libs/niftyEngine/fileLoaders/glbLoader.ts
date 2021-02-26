@@ -5,7 +5,7 @@ import { Texture } from "../gfx/texture";
 import { Color } from "../math/color";
 import { UberProgram } from "../prototype/uberShader/uberProgram";
 import { VertexData } from "../gfx/vertexData";
-import { UberMaterial } from "../prototype/uberShader/uberMaterial";
+import { UberMaterial, UberMaterialSide } from "../prototype/uberShader/uberMaterial";
 
 // TODO this needs to be rewritten
 export class GLBLoader {
@@ -216,7 +216,8 @@ export class GLBLoader {
                             var material = glbData.content.materials[primitive.material]
 
                             loadedProgram = new UberProgram(device)
-                            var defs = { LIGHT_COUNT: 1, ALBEDO_ONLY: 1, COLOR_ATTRIBUTE: vertAttributes.a_color.length > 0 ? 1 : 0, MULTIVIEW_COUNT: 2 }
+                            var defs = { LIGHT_COUNT: 1, ALBEDO_ONLY: 1, COLOR_ATTRIBUTE: vertAttributes.a_color.length > 0 ? 1 : 0 }
+                            //var defs = { LIGHT_COUNT: 1, COLOR_ATTRIBUTE: vertAttributes.a_color.length > 0 ? 1 : 0, MULTIVIEW_COUNT: 2 }
                             loadedProgram.updateDefines(defs)
                             loadedProgram.compile()
                             loadedProgram.createUniforms()
@@ -224,12 +225,6 @@ export class GLBLoader {
                             loadedMat.albedoTexture = GLBLoader.defaultTexture;
                             loadedMat.metallicTexture = GLBLoader.defaultTexture;
                             loadedMat.roughnessTexture = GLBLoader.defaultTexture;
-
-                            // TODO use  material.pbrMetallicRoughness.baseColorFactor / other params
-                            var baseColor = material.pbrMetallicRoughness.baseColorFactor;
-                            if (baseColor) {
-                                loadedMat.albedoColor = new Color(baseColor[0], baseColor[1], baseColor[2], baseColor[3])
-                            }
 
                             var baseColorTexture = material.pbrMetallicRoughness.baseColorTexture
                             if (baseColorTexture !== undefined) {
@@ -243,8 +238,30 @@ export class GLBLoader {
                                 var tx = await Texture.createFromeURL(device, URL.createObjectURL(blob))
                                 loadedMat.albedoTexture = tx
                             }
+
+                            // TODO use  material.pbrMetallicRoughness.baseColorFactor / other params
+                            var baseColor = material.pbrMetallicRoughness.baseColorFactor;
+                            if (!baseColorTexture && baseColor) {
+                                loadedMat.albedoColor = new Color(baseColor[0], baseColor[1], baseColor[2], baseColor[3])
+                            }
+
+                            var metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture
+                            if (metallicRoughnessTexture !== undefined) {
+                                var texture = glbData.content.textures[metallicRoughnessTexture.index]
+                                var src = glbData.content.images[texture.source]
+
+                                var bufferView = glbData.content.bufferViews[src.bufferView]
+
+                                let array = new Uint8Array(glbData.body, bufferView.byteOffset, bufferView.byteLength);
+                                var blob = new Blob([array], { type: src.mimeType });
+                                var tx = await Texture.createFromeURL(device, URL.createObjectURL(blob))
+                                loadedMat.metallicTexture = tx
+                            }
                         }
                         var m = new Mesh(new VertexData(device, vertAttributes), loadedMat)
+                        if (loadedMat) {
+                            loadedMat.side = UberMaterialSide.DOUBLE_SIDE
+                        }
                         loadedNode.addChild(m)
                     }
                 }
@@ -253,6 +270,9 @@ export class GLBLoader {
                 }
                 if (node.translation) {
                     loadedNode.position.set(node.translation[0], node.translation[1], node.translation[2])
+                }
+                if (node.scale) {
+                    loadedNode.scale.set(node.scale[0], node.scale[1], node.scale[2])
                 }
                 if (node.children) {
                     for (var childIndex of node.children) {

@@ -5,6 +5,7 @@ import { PMathTemp } from "./privateMathTemp";
 
 export class Vector3 {
     static _tmp0 = new Vector3()
+    static _tmp1 = new Vector3()
 
     v: twgl.v3.Vec3
     constructor(x = 0, y = 0, z = 0) {
@@ -38,6 +39,10 @@ export class Vector3 {
         return this
     }
 
+    equals(v: Vector3) {
+        return this.x == v.x && this.y == v.y && this.z == v.z
+    }
+
     setScalar(x: number) {
         this.set(x, x, x)
     }
@@ -48,7 +53,13 @@ export class Vector3 {
         this.z *= scaleVal
     }
 
-    addToRef(a: Vector3, res: Vector3) {
+    scaleToRef(scaleVal: number, res: Vector3 = this) {
+        res.x = this.x * scaleVal
+        res.y = this.y * scaleVal
+        res.z = this.z * scaleVal
+    }
+
+    addToRef(a: Vector3, res: Vector3 = this) {
         res.x = this.x + a.x
         res.y = this.y + a.y
         res.z = this.z + a.z
@@ -60,12 +71,15 @@ export class Vector3 {
 
     rotateByQuaternionToRef(q: Quaternion, res: Vector3) {
         PMathTemp.m1.compose(PMathTemp.vZero, q, PMathTemp.vOne)
-        this.rotateByMatrixToRef(PMathTemp.m1, res)
+        this.applyMatrixToRef(PMathTemp.m1, res)
     }
 
-    // Applies a matrix
-    // TODO rename to applyMatrix
-    rotateByMatrixToRef(m: Matrix4, res: Vector3) {
+    /**
+     * Applies a matrix including positing components (use transformDirectionToRef to only apply rotation)
+     * @param m 
+     * @param res 
+     */
+    applyMatrixToRef(m: Matrix4, res: Vector3) {
         var x = this.x, y = this.y, z = this.z;
         var e = m.m;
 
@@ -76,7 +90,13 @@ export class Vector3 {
         res.z = (e[2] * x + e[6] * y + e[10] * z + e[14]) * w;
     }
 
+    /**
+     * Only rotate direction by matrix's rotation & (scale? TODO confirm this) but ignore position
+     * @param m 
+     * @param res 
+     */
     transformDirectionToRef(m: Matrix4, res: Vector3) {
+        // TODO should this be normalizing?
         var x = this.x, y = this.y, z = this.z;
         var e = m.m;
 
@@ -87,16 +107,22 @@ export class Vector3 {
         res.normalizeToRef(res)
     }
 
-    subtractToRef(sub: Vector3, res: Vector3) {
+    subtractToRef(sub: Vector3, res: Vector3 = this) {
         res.x = this.x - sub.x
         res.y = this.y - sub.y
         res.z = this.z - sub.z
     }
-    normalizeToRef(res: Vector3) {
+    normalizeToRef(res: Vector3 = this) {
         var len = this.length()
-        res.x = this.x/len
-        res.y = this.y/len
-        res.z = this.z/len
+        res.x = this.x / len
+        res.y = this.y / len
+        res.z = this.z / len
+    }
+
+    multiplyToRef(b: Vector3, res = this) {
+        res.x = this.x * b.x
+        res.y = this.y * b.y
+        res.z = this.z * b.z
     }
 
     length() {
@@ -107,6 +133,16 @@ export class Vector3 {
         return this.x * v.x + this.y * v.y + this.z * v.z;
     }
 
+    crossToRef(a: Vector3, res: Vector3) {
+
+        var ax = this.x, ay = this.y, az = this.z;
+        var bx = a.x, by = a.y, bz = a.z;
+
+        res.x = ay * bz - az * by;
+        res.y = az * bx - ax * bz;
+        res.z = ax * by - ay * bx;
+    }
+
     toJSON() {
         return { x: this.x, y: this.y, z: this.z }
     }
@@ -115,6 +151,31 @@ export class Vector3 {
         (copyTo as any)[0] = this.x;
         (copyTo as any)[1] = this.y;
         (copyTo as any)[2] = this.z;
+    }
+
+    clone() {
+        return new Vector3(this.x, this.y, this.z)
+    }
+
+    clampToRef(min: Vector3, max: Vector3, ref: Vector3) {
+        ref.x = Math.min(Math.max(this.x, min.x), max.x)
+        ref.y = Math.min(Math.max(this.y, min.y), max.y)
+        ref.z = Math.min(Math.max(this.z, min.z), max.z)
+    }
+
+    projectOntoVectorToRef(onto: Vector3, res: Vector3 = this) {
+        Vector3._tmp0.copyFrom(onto)
+        Vector3._tmp0.normalizeToRef()
+        var dot = Vector3._tmp0.dot(this)
+        Vector3._tmp0.scaleToRef(dot, res)
+        return dot
+    }
+
+    projectOntoPlaneToRef(planeNormal: Vector3, res: Vector3 = this) {
+        var dot = this.projectOntoVectorToRef(planeNormal, Vector3._tmp0)
+        res.copyFrom(this)
+        res.subtractToRef(Vector3._tmp0)
+        return dot
     }
 }
 

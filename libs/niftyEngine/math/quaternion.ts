@@ -3,6 +3,7 @@ import { Vector3 } from "./vector3";
 import { Matrix4 } from "./matrix4";
 
 export class Quaternion {
+    static _tmp0 = new Quaternion()
     q: number[] | Float32Array
     constructor(x = 0, y = 0, z = 0, w = 1) {
         this.q = new Float32Array([x, y, z, w])
@@ -32,6 +33,10 @@ export class Quaternion {
     }
     get w() {
         return this.q[3];
+    }
+
+    clone() {
+        return new Quaternion(this.x, this.y, this.z, this.w)
     }
 
     set(x: number, y: number, z: number, w: number) {
@@ -123,11 +128,24 @@ export class Quaternion {
         }
     }
 
-    fromEuler(res: Vector3) {
+    /**
+     * Not fully tested
+     * @param x 
+     * @param y 
+     * @param z 
+     */
+    fromDirection(x: number, y: number, z: number) {
+        // dist is z for rotation on x axis after rotation on y axis is done
+        var dist = Math.sqrt(x * x + z * z)
+        // subtract pi from y rotation since -z is forward
+        this.fromEuler(Math.atan2(y, dist), Math.atan2(x, z) - Math.PI, 0)
+    }
+
+    fromEuler(x: number, y: number, z: number) {
         // Produces a quaternion from Euler angles in the z-y-x orientation (Tait-Bryan angles)
-        var halfRoll = res.z * 0.5;
-        var halfPitch = res.x * 0.5;
-        var halfYaw = res.y * 0.5;
+        var halfRoll = z * 0.5;
+        var halfPitch = x * 0.5;
+        var halfYaw = y * 0.5;
 
         var sinRoll = Math.sin(halfRoll);
         var cosRoll = Math.cos(halfRoll);
@@ -150,5 +168,16 @@ export class Quaternion {
         res.y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
         res.z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
         res.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
+    }
+
+    copyFrom(quaternion: Quaternion) {
+        this.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
+    }
+
+    // Get the negative quaternion value
+    inverseToRef(res: Quaternion) {
+        res.x = this.x * -1;
+        res.y = this.y * -1;
+        res.z = this.z * -1;
     }
 }

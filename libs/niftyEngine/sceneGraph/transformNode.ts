@@ -22,9 +22,9 @@ export class TransformNode extends Entity {
 
     static depthFirstIterate(root: TransformNode, fn: (node: TransformNode) => void) {
         fn(root)
-        root.getChildren().forEach((c) => {
+        for (var c of root.getChildren()) {
             this.depthFirstIterate(c, fn)
-        })
+        }
     }
 
     computeWorldMatrix(computeParentsFirst = true) {
@@ -58,7 +58,7 @@ export class TransformNode extends Entity {
     }
     removeChild(node: TransformNode) {
         var ind = this._children.indexOf(node)
-        if (ind > 0) {
+        if (ind >= 0) {
             node._parent = null
             this._children.splice(ind, 1)
         }

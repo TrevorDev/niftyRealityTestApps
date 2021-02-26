@@ -30,6 +30,20 @@ export class DefaultVertexData {
         });
     }
 
+    static createSphereWithInvertedNormalsVertexData(device: GPUDevice) {
+        var data = twgl.primitives.createSphereVertices(0.5, 16, 16) as any
+        for (var i = 0; i < data.normal.length; i++) {
+            data.normal[i] *= -1;
+        }
+
+        return new VertexData(device, {
+            a_position: data.position,
+            a_normal: data.normal,
+            a_texcoord: data.texcoord,
+            indices: data.indices,
+        });
+    }
+
     static createCylinderVertexData(device: GPUDevice) {
         var data = twgl.primitives.createTruncatedConeVertices(0.5, 0.5, 1, 6, 1) as any
 

@@ -6,38 +6,41 @@ interface Framebuffer {
     getHeight: Function
 }
 
+export class Light {
+    worldMatrix: Float32Array
+    brightness: number
+}
+
+export class AppFrame {
+    framebuffer: WebGLFramebuffer
+    framebufferWidth: number
+    framebufferHeight: number
+    anchor: Float32Array
+    appFocused: boolean
+    xrFrame: XRFrame | null
+    xrRefSpace: XRReferenceSpace | null
+    glContext: WebGL2RenderingContext
+    lights: Array<Light>
+}
+
 export class App {
-    private currentFrame: {
-        framebuffer: WebGLFramebuffer,
-        framebufferWidth: number,
-        framebufferHeight: number,
-        anchor: Float32Array
-    }
+    private currentFrame: AppFrame
     getCurrentFrame() {
-        this.currentFrame.framebuffer = this.getFrameBuffer().glFramebuffer!
-        this.currentFrame.framebufferWidth = this.getFrameBuffer().getWidth()
-        this.currentFrame.framebufferHeight = this.getFrameBuffer().getHeight()
-        this.currentFrame.anchor = this.anchor
+        this.currentFrame = this.getFrame()
         return this.currentFrame
     }
 
-    constructor(private anchor: Float32Array, private getFrameBuffer: () => Framebuffer) {
-        this.currentFrame = {
-            framebuffer: getFrameBuffer(),
-            framebufferWidth: getFrameBuffer().getWidth(),
-            framebufferHeight: getFrameBuffer().getHeight(),
-            anchor: anchor
-        }
+    constructor(private getFrame: () => AppFrame) {
+        this.currentFrame = getFrame()
     }
 
     /**
      * Event for the application to tell the os if controller rays have hit the app
-     * @param castingController controller that requesting a ray cast
-     * @param result result of the raycast that should be populated based on the raycast
+     * @param world world matrix of the ray that is casting
      */
-    // castRay(castingController: XRController, result: HitResult) {
-    //     result.reset()
-    // }
+    castRay(world: Float32Array) {
+        return Infinity
+    }
 
     /**
      * Update loop for the app (called every frame) it is the apps responsibility to pause itself by doing nothing if not active
@@ -54,4 +57,11 @@ export class App {
     dispose() {
 
     }
+}
+
+// To workaround bug where copying from canvas2D during webgl render corrupts webgl framebuffer when oculus multiview is used
+export let runCanvasMethod = (fn: Function) => {
+    setTimeout(() => {
+        fn()
+    }, 0);
 }

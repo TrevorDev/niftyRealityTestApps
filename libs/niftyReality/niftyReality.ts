@@ -1,5 +1,5 @@
 import { AppSpec } from "./appSpec";
-//import { NiftyOS } from "../niftyOS";
+//import { NiftyOS } from "../niftyOS/niftyOS";
 
 export class NiftyReality {
     private static getOS() {
@@ -9,11 +9,5 @@ export class NiftyReality {
     }
     static registerApp(options: AppSpec) {
         this.getOS().registerApp(options)
-    }
-    static getWebGLContext() {
-        return this.getOS().device.gl;
-    }
-    static getInput() {
-        return this.getOS().inputManager.input
     }
 }

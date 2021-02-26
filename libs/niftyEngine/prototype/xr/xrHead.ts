@@ -4,6 +4,8 @@ import { TransformNode } from "../../sceneGraph/transformNode";
 import { Camera } from "../../sceneGraph/camera";
 
 export class XRHead extends TransformNode {
+    static NEAR_Z = 0.2
+    static FAR_Z = 1000
     leftEye: Camera
     rightEye: Camera
     cameras: Array<Camera>
@@ -17,7 +19,7 @@ export class XRHead extends TransformNode {
 
         this.cameras.forEach((e) => {
             //  console.log(e)
-            e.projection.setProjection(30 * Math.PI / 180, 1, 0.2, 150)
+            e.projection.setProjection(30 * Math.PI / 180, 1, XRHead.NEAR_Z, XRHead.FAR_Z)
             this.addChild(e)
         })
     }

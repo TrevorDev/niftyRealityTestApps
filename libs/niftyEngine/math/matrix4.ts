@@ -4,6 +4,7 @@ import { Quaternion } from "./quaternion";
 
 export class Matrix4 {
     static _tmp0 = new Matrix4()
+    static _tmp1 = new Matrix4()
 
     m: twgl.m4.Mat4
     constructor() {
@@ -191,4 +192,11 @@ export class Matrix4 {
     copyFromArrayBufferView(copyFrom: Float32Array) {
         twgl.m4.copy(copyFrom, this.m)
     }
+
+    // Sets res to this matrix without scale/position
+    extractRotationToRef(res: Matrix4) {
+        this.decompose(undefined, Quaternion._tmp0)
+        res.compose(undefined, Quaternion._tmp0, undefined)
+    }
+
 }

@@ -1,11 +1,11 @@
 export class Entity {
-    components: { [componentName: string]: Array<any> } = {};
+    private components_: { [componentName: string]: Array<any> } = {};
 
     addComponent(component: Function) {
-        if (!this.components[component.name]) {
-            this.components[component.name] = []
+        if (!this.components_[component.name]) {
+            this.components_[component.name] = []
         }
-        this.components[component.name].push(component)
+        this.components_[component.name].push(component)
     }
 
     getComponent<T>(component: Function): T | undefined {
@@ -13,6 +13,6 @@ export class Entity {
         return list != undefined ? list[0] : undefined
     }
     getComponents<T>(component: Function): Array<T> | undefined {
-        return this.components[component.name] as Array<T>
+        return this.components_[component.name] as Array<T>
     }
 }
