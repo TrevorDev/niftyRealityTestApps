@@ -10,7 +10,7 @@
                   __/ |                         __/ |
                  |___/                         |___/ 
 
-This is not a test app repo, it's a movement
+This is not a test app repo, it's a movement.
 ```
 
 ### How to run
